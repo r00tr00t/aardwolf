@@ -1,0 +1,56 @@
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE muclient>
+<muclient>
+<plugin
+   name="Equipment_Sets"
+   author="Zhalut"
+ 
+   id="cec5d6c8be7d7f350987b022"
+   language="Lua"
+   purpose="Cretes Equipment Sets for Fast Swapping Between Sets"
+   date_written="2016-09-16 16:37:14"
+   requires="5.01"
+   version="1.0"
+   save_state="y"
+   >
+
+<description trim="n">
+<![CDATA[
+Intentionally blank for now
+]]>
+</description>
+
+</plugin>
+
+
+<!--  Get our standard constants -->
+
+<include name="constants.lua"/>
+<aliases>
+
+  <send>Say I am da man</send>
+  </alias>
+  <alias
+    match="z_test"
+    enabled="y"
+    script="z_eq_worn"
+    sequence="6"
+  >
+  </alias>
+</aliases>
+
+<script>
+<![CDATA[
+
+
+function z_eq_worn ()
+    print("success")
+end
+
+
+]]>
+</script> 
+
+
+</muclient>
