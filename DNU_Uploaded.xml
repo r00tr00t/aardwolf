@@ -1,0 +1,78 @@
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE muclient>
+<muclient>
+<plugin
+   name="z_Equipment_Sets"
+   author="Zhalut"
+   id="cec5d6c8be7d7f350987b022"
+   language="Lua"
+   purpose="Cretes Equipment Sets for Fast Swapping Between Sets"
+   date_written="2016-09-16 16:37:14"
+   requires="5.01"
+   version="1.0"
+   save_state="y"
+   >
+<description trim="n">
+<![CDATA[
+Intentionally blank for now
+]]>
+</description>
+</plugin>
+
+<!--  Get our standard constants -->
+<include name="constants.lua"/>
+
+<aliases>
+  <alias
+    match="z_blue"
+    enabled="y"
+    sequence="6"
+    send_to="12"
+  >  
+  <send>
+    EnableTrigger("trg_eq_worn_line", true)
+  </send> 
+  </alias>
+</aliases>
+
+<triggers>
+  <trigger match="{/eqdata}"
+    name="test2"
+    enabled="y"
+    regexp="n"
+    omit_from_output="y"
+    sequence="500"
+    send_to="12"
+    >
+    <send>
+    EnableTrigger("trg_eq_worn_line", false)
+  </send>
+  </trigger>
+
+  <trigger match="(?<id>\d+),(?<iflgs>\w+)?,(?<disp>[^,]+),(?<lvl>\d+),(?<type>\d+),(?<unq>\d+),(?<wear>-?\d+),(?<tmr>-?\d+)"
+    name="trg_eq_worn_line"
+    script="f_eq_worn"
+    enabled="n"
+    regexp="y"
+    omit_from_output="y"
+    sequence="500">
+  </trigger>
+</triggers>
+
+<script>
+<![CDATA[  
+  function f_eq_worn (name, line, wildcards)
+  
+        print(name)
+        print(line)
+        print(wildcards[1])
+        print(wildcards[2])
+        print(wildcards[3])
+        print(wildcards[4])
+        print(wildcards[5])
+  end
+]]>
+</script> 
+</muclient>
+
