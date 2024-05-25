@@ -1,0 +1,807 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE muclient>
+<!-- Saved on Wednesday, July 04, 2018, 1:52 PM -->
+<!-- MuClient version 5.06-pre -->
+
+<muclient>
+<plugin
+   name="Aard_WCC_Epic"
+   author="Zhalut"
+   id="f8f2defc6330b446a8d91690"
+   language="Lua"
+   purpose="White Claw (WCC) Epic Alerts."
+   date_written="2024-05-16 00:00:00"
+   requires="4.30"
+   version="1.1"
+   >
+</plugin>
+
+<!--  Triggers  -->
+
+<triggers>
+<trigger
+   group = "wcc"
+   enabled="y"
+   regexp="n"
+   match="A burrowing ice wyrm rockets past you, cleaving through the ground like a shark."
+   sequence="100"
+   send_to="12"
+  ><send> Send("map")</send>
+  </trigger>
+  <trigger
+   group="wcc"
+   enabled="y"
+   regexp="n"
+   match="A white dragon whelp staggers and collapses to the frozen ground, clearly"
+   sequence="100"
+   script="alert.whelp"
+  >
+  </trigger>
+  <trigger
+   group="wcc"
+   enabled="y"
+   regexp="n"
+   match="Uh oh, looks like you've drawn the attention of Anxia, the Frigid One!"
+   sequence="100"
+   script = "alert.ice"
+  ></trigger>
+  
+  <trigger
+   group="wcc"
+   enabled="y"
+   regexp="y"
+   multi_line="y"
+   lines_to_match="2"
+   match="^And just like that, the last of the thin layer of ice that was protecting\nyou has disappeared, like the last vestiges of mist in the morning\.$"
+   sequence="100"
+   send_to="12"
+  ><send> ColourNote("yellow","","  >>","",""," Breath evaporated")
+        Send("wear breath")
+      </send>
+  </trigger>
+  <trigger
+   group="wcc"
+   enabled="y"
+   regexp="n"
+   match="A slight tremor in the ground is never a good sign! Run!"
+   sequence="100"
+   script="alert.wyrm"
+  >
+  </trigger>
+ <trigger
+   group="wcc"
+   enabled="y"
+   regexp="y"
+   multi_line="y"
+   lines_to_match="2"
+   match="^You see a massive stalactite fall from the cave ceiling and land in\nthe (.+) side of the cavern\.$"
+   sequence="100"
+   script="alert.stalactite"
+  >
+ </trigger>
+ <trigger
+   group="wcc"
+   enabled="y"
+   regexp="n"
+   match="You dive out of the way as a massive stalactite falls from above!"
+   sequence="100"
+   script="alert.stalactite"
+  >
+ </trigger>
+ <trigger
+   group="wcc"
+   name="listen_dragon"
+   enabled="n"
+   regexp="y"
+   match="^You carefully let go of a Cloud of Permafrost, which lazily floats into$"
+   sequence="100"
+   script="wcc.goStart"
+  >
+  </trigger>
+ <trigger
+   group="wcc"
+   enabled="y"
+   regexp="y"
+   multi_line="y"
+   lines_to_match="4"
+   match="^With a trembling hand, you splay your fingers and palm across the rune\nand are surprised at how warm it feels\. You wait a moment for something\nto happen, but alas, nothing does\. You get the sense that you may have to\nwait a bit more time\. \((?<hours>\d+):(?<mins>\d+):(?<secs>\d+)\)$"
+   sequence="100"
+   send_to="12"
+  > -- this is capturing remaining time to epic
+  </trigger>
+ <trigger
+   group="wcc"
+   enabled="y"
+   regexp="y"
+   multi_line="y"
+   lines_to_match="6"
+   match="^With a trembling hand, you splay your fingers and palm across the rune\nand are surprised at how warm it feels\. Before you have time to react,\nthere's a pulling sensation in your abdomen and then chaos erupts as\nyour body compresses in a whirlwind of wind and fluttering snowflakes\.\nWith a pop of sound and a small shockwave, you reappear somewhere else\nwith an overwhelming urge to fall to your knees and hurl\.$"
+   sequence="100"
+   script="wcc.start"
+  >
+  </trigger>
+ <trigger
+   group="wcc_gag"
+   enabled="n"
+   regexp="y"
+   omit_from_output="y"
+   multi_line="y"
+   lines_to_match="5"
+   keep_evaluating="y"
+   match="^A white dragon whelp staggers and collapses to the frozen ground, clearly\non its last legs of life\. You can't help but feel bad, having just killed\na newborn, but as you watch the creature die, its last shuddering breath\nreleases a cloud of ice into the air\. You quickly scoop it up with your\nhands, the floating ice crystals strangely warm to the touch\.$"
+   sequence="100"
+   send_to="12"
+  ><send>utility.print("(Gagged) Whelp death spam.")</send>
+  </trigger>
+ <trigger
+   group="wcc"
+   enabled="y"
+   regexp="y"
+   match="^Your skin begins to tingle and your teeth begin to chatter from the cold! \[\d+\]"
+   sequence="100"
+   script="alert.damaged"
+  > -- Your skin begins to tingle and your teeth begin to chatter from the cold! [10329]
+ </trigger>
+ <trigger
+   group="wcc"
+   enabled="y"
+   regexp="y"
+   match="^You scream in pain as microscopic shards of ice rip through your body\. \[\d+\]$"
+   sequence="100"
+   script="alert.damaged"
+  > -- You scream in pain as microscopic shards of ice rip through your body. [9724]
+ </trigger>
+ <trigger
+   group="wcc"
+   enabled="y"
+   regexp="y"
+   match="^You stagger against the vortex of sharp icicles slamming into you\. \[\d+\]$"
+   sequence="100"
+   script="alert.damaged"
+  > -- You stagger against the vortex of sharp icicles slamming into you. [10482]
+ </trigger>
+  <trigger
+   group="wcc"
+   enabled="y"
+   regexp="n"
+   match="A large fissure has torn the cave wall wide open here."
+   sequence="100"
+   send_to="12"
+  ><send> -- A large fissure has torn the cave wall wide open here.
+          ColourNote("yellow","","  >>","white","red"," Enter Fissure Here")
+          wcc.fissure = gmcp("room.info.num")
+          wcc.startRoom = nil
+  </send>
+  </trigger>
+  <trigger
+   group="wcc"
+   name="completion"
+   enabled="y"
+   regexp="y"
+   match="^You hear a faint whisper in the back of your mind, warning you not to return for (?<hours>\d+):(?<mins>\d+):(?<secs>\d+)\."
+   sequence="100"
+   script="wcc.timer"
+  >
+  </trigger>
+
+</triggers>
+<!--  Aliases  -->
+
+<aliases>
+
+  <alias
+   script="utility.pluginReload"
+   match="wcc reload"
+   ignore_case="y"
+   enabled="y"
+   regexp="n"
+   sequence="100"
+  >
+  </alias>
+  <alias
+   group="wcc"
+   match="wcc begin"
+   ignore_case="y"
+   enabled="y"
+   regexp="n"
+   sequence="100"
+   script="wcc.startCommands"
+  >
+  </alias>
+ <alias
+   group="wcc"
+   match="wcc exit"
+   enabled="y"
+   ignore_case="y"
+   regexp="n"
+   sequence="100"
+   script="wcc.exit"
+  >
+  </alias>
+ <alias
+   match="wcc report"
+   enabled="y"
+   ignore_case="y"
+   regexp="n"
+   sequence="100"
+   script="wcc.report"
+  >
+  </alias>
+  <alias
+   group="wcc"
+   match="^wcc (?:drag|dragon)$"
+   enabled="y"
+   ignore_case="y"
+   regexp="y"
+   sequence="100"
+   script="wcc.dragon"
+  >
+  </alias>
+  <alias
+   name="alias_time"
+   match="^wcc timer?"
+   enabled="y"
+   ignore_case="y"
+   regexp="y"
+   sequence="100"
+   script="wcc.timer"
+  >
+  </alias>
+   <alias
+   match="^wcc sound(?: (on|off))?$"
+   enabled="y"
+   regexp="y"
+   sequence="1"
+   script="alert.soundToggle"
+  >
+  </alias>
+   <alias
+   match="^wcc notes?(?: (on|off))?$"
+   enabled="y"
+   regexp="y"
+   sequence="1"
+   script="alert.announceToggle"
+  >
+  </alias>
+   <alias
+   match="wcc help"
+   enabled="y"
+   regexp="n"
+   sequence="100"
+   script="help.show"
+  >
+  </alias>
+</aliases>
+
+<!--  Script  -->
+
+<script>
+<![CDATA[
+require "gmcphelper"
+require "tprint"
+dofile(GetInfo(60) .. "aardwolf_colors.lua")
+
+----------------------------------------------------------------------------------------------------------
+-- Global vars and tables
+----------------------------------------------------------------------------------------------------------
+to_bool = {["0"] = false, ["1"] = true}
+
+wcc = {}
+wcc.name = "WCC White Claw Crag"
+wcc.ver = "1.0.0"
+wcc.isEnabled = false
+
+wcc.data = {}
+wcc.startTime = nil
+wcc.startRoom = nil
+
+
+function wcc.startCommands()
+    if gmcp("room.info.zone") ~= "whiteclaw" then
+      utility.print("commands works only in whiteclaw area")
+      return
+    else
+        -- open second goal
+      Send("touch rune") Send("run 2n")
+      Send("look dragon") Send("run sw")
+    end
+end
+function wcc.start()
+  wcc.startTime = os.time()
+  wcc.data = {}
+  wcc.data[wcc.startTime] = {
+    startTime = wcc.startTime,
+    ice = {},
+    stalactites = {},
+    wyrms = {},
+    whelps = {},
+    damaged ={}
+    }
+end
+function wcc.stop()
+  utility.print("Use 'wcc report' to print data from the fight.")
+end
+function wcc.record(event, time, note)
+  table.insert(wcc.data[wcc.startTime][event], {
+    timestamp = time,
+    evenTime = os.date('%H:%M:%S',time),
+    elapsed = utility.dispTime(time - wcc.startTime),
+    note = note
+    })
+end
+
+function wcc.report()
+  -- should build this out into an insightful colournote summary
+  if next(wcc.data) then
+    tprint(wcc.data)
+  else
+    Note("WCC data table is empty")
+  end
+end
+
+--[[
+  Get a flaming sun gem from a firestorm phoenix.
+  Mapper find icereach mountains.
+  Go to each room until you find a Yeti.
+  Give gem yeti to enter.
+  Goal opens on begin and clears on lazy finish.
+  Second goal opens when you look at Anxia(do so quickly as her mprog dam will
+  invalidate the run for completion)
+  Bring a cloud of permafrost from a previous attempt when doing second goal version.
+]]
+
+
+function wcc.exit(name, line, args)
+  if gmcp("room.info.zone") ~= "whiteclaw" then
+    utility.print("Command only works in whiteclaw area")
+    return
+  elseif (wcc.fissure == nil) then
+    utility.print("Unknown Exit. @WFind the exit first.@w")
+    return
+  end
+  Execute("mapper walkto " .. wcc.fissure)
+  Execute("enter fissure")
+  -- You jump through the fissure in the wall and are consumed by glacial
+  -- clear wcc.fissure and wcc.start
+  -- With a trembling hand, you splay your fingers and palm across the rune
+  -- clear wcc.fissure and wcc.start
+  -- You carefully let go of a Cloud of Permafrost, which lazily floats into
+  -- then go back to your safe room
+end
+function wcc.dragon()
+  if gmcp("room.info.zone") ~= "whiteclaw" then
+    utility.print("commands works only in whiteclaw area")
+    return
+  end
+  wcc.startRoom = gmcp("room.info.num")
+  utility.print("Walking to dragon")
+  EnableTrigger("listen_dragon", true) -- will return you to starter room
+  Execute("mapper goto 37485") -- dragon room
+  Execute("drop cloud")
+
+end
+function wcc.goStart()
+  if (gmcp("room.info.zone") ~= "whiteclaw") then
+    utility.print("commands works only in whiteclaw area")
+    return
+  end
+  --[[ DRAFT -- NOT USED
+    this is part of a series of functions to do after the epic is
+    complete, to walk to dragon room, drop cloud in dragon room,
+    and return to the room before walking to dragon
+  ]]
+  if (wcc.startRoom == nil) then
+    utility.print("Unkown Starter Room. @WWalk out manually.@w or 'wcc exit'")
+    return
+  end
+  Execute("mapper walkto " .. wcc.startRoom)
+end
+function wcc.timer(name, line, args)
+  if name == "completion" then
+    -- record time
+      local now = os.time()
+      local at = os.time() + args.hours * 60 * 60 + args.mins * 60 + args.secs
+      --Note("countdown is " .. tostring(at))
+      wcc.stop()
+      SetVariable("cooldown", at)
+      SaveState()
+  elseif name == "alias_time" then
+    -- report time
+      local _cooldown = tonumber(GetVariable("cooldown"))
+      if _cooldown == "unknown" then
+        ColourNote("#FBFF00", "", "\n >> ", "#9AC7FE", "", "Whiteclaw", "silver", "", " cooldown is ", "white", "", _cooldown, "silver", "", ".\n")
+        Send("tell Nothamil time")
+      elseif _cooldown > os.time() then
+        ColourNote("#FBFF00", "", "\n >> ", "#9AC7FE", "", "Whiteclaw", "silver", "", " is available on ", "white", "", os.date("%A at %I:%M:%S %p", _cooldown), "silver", "", ".\n")
+      elseif _cooldown < os.time() then
+        ColourNote("#FBFF00", "", "\n >> ", "#9AC7FE", "", "Whiteclaw", "silver", "", " is available ", "white", "", "now", "silver", "", "!", "gray", "", " ("..os.date("%A at %I:%M:%S %p", _cooldown)..")\n")
+      elseif os.date("%m%d%Y", winds) == os.date("%m%d%Y", os.time()) then
+        ColourNote("#FBFF00", "", "\n >> ", "#9AC7FE", "", "Whiteclaw", "silver", "", " is available ", "white", "", os.date("Today at %I:%M:%S %p", _cooldown), "silver", "", ".\n")
+      end
+  end
+end
+
+----------------------------------------------------------------------------------------------------------
+-- Alerts
+----------------------------------------------------------------------------------------------------------
+
+alert = {}
+alert.soundOn = to_bool[GetVariable("soundOn")] or true
+alert.announce = to_bool[GetVariable("announce")] or true -- used to show timestamp when alerts happen
+_prettifiedRoomNames = {
+  {
+    room = "37472",
+    name = "NW"
+  },
+  {
+    room = "37470",
+    name = "SW"
+  },
+  {
+    room = "37470",
+    name = "LN"
+  },
+  {
+    room = "37476",
+    name = "LS"
+  },
+  {
+    room = "37481",
+    name = "RN"
+  },
+  {
+    room = "37475",
+    name = "RS"
+  },
+  {
+    room = "37479",
+    name = "NE"
+  },
+  {
+    room = "37477",
+    name = "SE"
+  },
+}
+function alert.wyrm(name, line, args)
+     --[[
+     if (not wcc.isEnabled)  then
+          utility.print("alert.wyrm: did not execute because it is disabled.")
+          return
+     end
+     ]]
+     wcc.record("wyrms",os.time())
+      local report_msg = "  @W>>> [@GALERT: " .. "WCC" .. "@W]@Y " .. " MOVE WYRM"
+      CallPlugin("b555825a4a5700c35fa80780","storeFromOutside", tostring(report_msg))
+      Send("map")
+      Note("")
+      utility.sendDots()
+      Note("")
+      ColourNote("yellow", "",   ">>  ","red",""," WYRM MOVE ")
+      if alert.soundOn then
+          PlaySound(0, "scry.wav", false, -10, 0)
+      end
+      --ColourNote("lime", "", "  "..line)
+      Note("")
+      utility.sendDots()
+    if alert.announce then
+      Note(os.date('%H:%M:%S') .. " wyrm")
+    end
+end
+
+function alert.stalactite(name, line, args)
+  local timestamp = os.time()
+  local msg = args[1] or "your room"
+  if (msg == "") then msg = "your room"  end -- maybe later add room number via lookup?
+  wcc.record("stalactites",timestamp, msg)
+  SendNoEcho("map")
+  ColourNote("yellow","","  >> ","",""," Stalactite in ","cyan","",msg)
+  if alert.announce then
+    Note(os.date('%H:%M:%S') .. " stalactite " .. utility.dispTime(timestamp - wcc.startTime))
+  end
+end
+function alert.ice(name, line, args)
+  local timestamp = os.time()
+  wcc.record("ice",timestamp)
+  ColourNote("yellow","","  >> ","",""," Anxia preparing to drop ice")
+    --    ColourNote("orange", "", "   A ", "deepskyblue", "", "rune", "orange", "", " is here!  ", "yellow", "", "Check ASCII and MOVE!")
+  if alert.announce then
+    Note(os.date('%H:%M:%S') .. " ice " .. utility.dispTime(timestamp - wcc.startTime))
+  end
+end
+function alert.whelp(name, line, args)
+  local timestamp = os.time()
+    -- at some point, turn the room number into location
+    local room = gmcp("room.info.num")
+    local msg = "unknown room"
+    for k, v in ipairs(_prettifiedRoomNames) do
+      if (v["room"] == room) then 
+        msg = v["name"]
+        break
+      end
+    end
+    --wcc.record("whelps",timestamp,gmcp("room.info.num"))
+    wcc.record("whelps",timestamp,msg)
+    Send("wear breath")
+    local msg = ""
+    if next(wcc.data[wcc.startTime]["whelps"]) then
+      msg = "Whelp #" .. #wcc.data[wcc.startTime]["whelps"]
+    end
+    if alert.notesOn then
+      Note(os.date('%H:%M:%S') .. " " .. msg .. " " .. utility.dispTime(timestamp - wcc.startTime))
+    end
+end
+function alert.damaged(name, line, args)
+  local timestamp = os.time()
+  wcc.record("damaged",timestamp,line)
+end
+function alert.soundToggle(name, line, args)
+  local input = string.lower(args[1])
+  if input == "on" then
+    alert.soundOn = true
+  elseif input == "off" then
+    alert.soundOn = false
+  else
+    alert.soundOn = not alert.soundOn
+  end
+  if alert.soundOn then
+    SetVariable("soundOn",1)
+    utility.print("Alert sounds now @G[ON]@w")
+  else
+    SetVariable("soundOn",0)
+    utility.print("Alert sounds now @R[OFF]@w")
+  end
+  SaveState()
+end
+function alert.announceToggle(name, line, args)
+  local input = string.lower(args[1])
+  if input == "on" then
+    alert.announce = true
+  elseif input == "off" then
+    alert.announce = false
+  else
+    alert.announce = not alert.announce
+  end
+  if alert.announce then
+    SetVariable("announce",1)
+    utility.print("Alert noting duration after event now @G[ON]@w")
+  else
+    SetVariable("announce",0)
+    utility.print("Alert noting duration after event now @R[OFF]@w")
+  end
+  SaveState()
+end
+----------------------------------------------------------------------------------------------------------
+-- Utilities
+----------------------------------------------------------------------------------------------------------
+
+utility = {}
+
+
+function utility.printFormat(msg)
+  local formattedMsg = ""
+
+  if (msg ~= nil) and (msg ~= "") then
+
+    local outerColor = "@x105"
+    local innerColor = "@x39"
+
+    formattedMsg = outerColor .. "[" .. innerColor .. wcc.name .. outerColor .. "]@w " .. msg .. "@w"
+  end -- if
+
+  return formattedMsg
+end -- utility.printFormat
+
+
+function utility.printColors(msg)
+  print(AnsiNote(stylesToANSI(ColoursToStyles(msg))))
+end -- utility.printColors
+
+
+function utility.print(msg)
+  if (msg ~= nil) and (msg ~= "") then
+    local formattedMsg = utility.printFormat(msg)
+    utility.printColors(formattedMsg)
+
+    -- If the user wants us to mirror messages to the commlog, do it :)
+    --[[
+    local commlogState = wcc.commlogGet()
+    if (commlogState == "on") then
+      wcc.commLog(formattedMsg)
+    end -- if
+    ]]
+  end -- if
+end -- utility.print()
+
+function utility.pluginReload()
+     local scriptPrefix = GetAlphaOption("script_prefix")
+     local retval
+
+  -- If the user has not already specified the script prefix for this version of mush, pick a
+  -- reasonable default value
+  if (scriptPrefix == "") then
+     scriptPrefix = "\\\\\\"
+     SetAlphaOption("script_prefix", scriptPrefix)
+  end
+  local plugin_name = GetPluginInfo(GetPluginID(), 1)
+  Note("Reloading " .. plugin_name)
+
+  --reset_globals()
+
+  retval = Execute(scriptPrefix.."DoAfterSpecial(0.1, \"ReloadPlugin('"..GetPluginID().."')\", sendto.script)")
+  if (retval ~= 0) then
+     Note(plugin_name .. " failed to reload. Reload manually, the old-fashioned way " .. retval)
+     retval = DRL_RET_INTERNAL_ERROR
+  end -- if
+
+  return retval
+end
+
+function utility.sendDots()
+     for i = 1, 40 do
+          ColourTell("red", "", "-", "red", "", "-")
+     end
+     Tell("\n")
+end
+
+function utility.dispTime(time)
+  local days = math.floor(time/86400)
+  local remaining = time % 86400
+  local hours = math.floor(remaining/3600)
+  remaining = remaining % 3600
+  local minutes = math.floor(remaining/60)
+  remaining = remaining % 60
+  local seconds = remaining
+  if (hours < 10) then
+    hours = "0" .. tostring(hours)
+  end
+  if (minutes < 10) then
+    minutes = "0" .. tostring(minutes)
+  end
+  if (seconds < 10) then
+    seconds = "0" .. tostring(seconds)
+  end
+
+  if hours == "00" and days == 0 then
+    --"@D[@WCC@D]:@G " .. "Finished in:@Y " .. minutes..':'..seconds
+    return minutes..':'..seconds
+  else
+    return "error"
+  end
+end
+
+----------------------------------------------------------------------------------------------------------
+-- Utilities
+----------------------------------------------------------------------------------------------------------
+
+_prevArea = nil
+_targetArea = nil
+
+function OnPluginBroadcast (msg, id, name, text)
+  
+    if (text == "room.info") then
+      local _tmpArea = gmcp("room.info.zone")
+      if (_tmpArea == _targetArea and _prevArea ~= epicArea) then
+        -- player entered white claw, turn on triggers
+        EnableTriggerGroup("wcc", true)
+        --Note("entered wcc")
+      elseif (_prevArea == _targetArea and _tmpArea ~= _prevArea and _prevArea ~= nil) then
+        -- player left whiteclaw, do stuff at the end
+        EnableTriggerGroup("wcc", false)
+        -- (this is also message to finish, after entering fissure)
+        -- You jump through the fissure in the wall and are consumed by glacial
+        --Note("left wcc")
+        wcc.stop()
+      end
+      _prevArea = _tmpArea
+    end
+
+end
+
+----------------------------------------------------------------------------------------------------------
+-- Plugin Help
+----------------------------------------------------------------------------------------------------------
+help = {}
+
+
+function help.show()
+    local plugin_version = tostring(GetPluginInfo(GetPluginID(), 19))
+    for i = 1, 38 do
+        ColourTell("gray", "", "-", "blue", "", "-")
+      end
+      Tell("\n")
+      ColourNote("white", "", "  Aard Whiteclaw (WCC) v" .. plugin_version)
+      for i = 1, 38 do
+        ColourTell("gray", "", "-", "blue", "", "-")
+      end
+
+  Tell("\n")
+  ColourNote("silver", "", "  This plugin is to be used in Whiteclaw.\n")
+  ColourTell("white", "", "   wcc begin                  ")
+  ColourNote("gray", "", "After giving gem to yeti, this command enters boss area, runs to boss, and looks at it.\n")
+  ColourTell("white", "", "   wcc dragon                 ")
+  ColourNote("gray", "", "Walk to dragon room, drop cloud, and return to room.\n")
+  ColourTell("white", "", "   wcc report                 ")
+  ColourNote("gray", "", "Report recorded events from last WCC battle.\n")
+  ColourTell("white", "", "   wcc exit                   ")
+  ColourNote("gray", "", "Walk to fissure (exit) and enter it.\n")
+  ColourTell("white", "", "   wcc time                   ")
+  ColourNote("gray", "", "Reports cooldown timer before next run can be attempted.\n")
+  ColourTell("white", "", "   wcc sound                  ")
+  ColourNote("gray", "", "Toggle sound for certain alerts.\n")
+  ColourTell("white", "", "   wcc notes                  ")
+  ColourNote("gray", "", "Toggles the notes after events that include time since event began..\n")
+  Note("")
+  for i = 1, 38 do
+    ColourTell("gray", "", "-", "blue", "", "-")
+  end
+  Tell("\n")
+  for i = 1, 38 do
+    ColourTell("gray", "", "-", "blue", "", "-")
+  end
+  Tell("\n")
+end 
+--[[
+  Needed
+    -- toggle noting timestamps
+]]
+
+
+----------------------------------------------------------------------------------------------------------
+-- Extras
+----------------------------------------------------------------------------------------------------------
+
+--[[ test data
+  -- start
+  \\\Simulate("With a trembling hand, you splay your fingers and palm across the rune\nand are surprised at how warm it feels. Before you have time to react,\nthere's a pulling sensation in your abdomen and then chaos erupts as\nyour body compresses in a whirlwind of wind and fluttering snowflakes.\nWith a pop of sound and a small shockwave, you reappear somewhere else\nwith an overwhelming urge to fall to your knees and hurl.\n\n")
+  -- ice
+    \\\Simulate("Uh oh, looks like you've drawn the attention of Anxia, the Frigid One!\n")
+  --- stalactites
+    \\\Simulate("You see a massive stalactite fall from the cave ceiling and land in\nthe eastern side of the cavern.\n")
+  --- wyrm
+    \\\Simulate("A slight tremor in the ground is never a good sign! Run!\n")
+  -- whelp dead
+  \\\Simulate("A white dragon whelp staggers and collapses to the frozen ground, clearly\n")
+
+You stagger against the vortex of sharp icicles slamming into you. [10482]
+
+should this be gagged?
+
+wear breath
+With morbid curiosity, you press your hand into the floating cloud of
+ice crystals not really expecting much to happen, but as soon as your
+fingers penetrate the fine mist it begins to spread! In a panic, you
+shake your hand but any ice particles that flew off from the momentum
+quickly fly back to your body. Before long, your entire body is covered
+in a thin layer of ice particles, and... strangely... it feels warm.
+You feel safe, but for how long?
+
+\\\Simulate("With morbid curiosity, you press your hand into the floating cloud of\nice crystals not really expecting much to happen, but as soon as your\nfingers penetrate the fine mist it begins to spread! In a panic, you\nshake your hand but any ice particles that flew off from the momentum\nquickly fly back to your body. Before long, your entire body is covered\nin a thin layer of ice particles, and... strangely... it feels warm.\nYou feel safe, but for how long?\n")
+
+
+dragon died
+A white dragon whelp staggers and collapses to the frozen ground, clearly
+on its last legs of life. You can't help but feel bad, having just killed
+a newborn, but as you watch the creature die, its last shuddering breath
+releases a cloud of ice into the air. You quickly scoop it up with your
+hands, the floating ice crystals strangely warm to the touch.
+
+ice dropped
+Anxia, the Frigid One opens her jaws and fires a lob of frozen breath
+at you. You narrowly avoid it landing on your head, but as it makes
+contact with the ground it shatters into a million little pieces which
+begin to float into the air and whirl about at unbelievable speeds.
+
+
+-- can i get all these damage messages and log them, so we can count someone failed?
+You scream in pain as microscopic shards of ice rip through your body. [9724]
+Your skin begins to tingle and your teeth begin to chatter from the cold! [10329]
+]]
+
+-- whiteclaw: 37466 entrance room to run on scripts?
+-- can also prompt ppl to "wcc begin"
+-- 37485 dragon room
+]]>
+</script>
+
+
+</muclient>
