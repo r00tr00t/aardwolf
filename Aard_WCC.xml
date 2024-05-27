@@ -12,7 +12,7 @@
    purpose="White Claw (WCC) Epic Alerts."
    date_written="2024-05-16 00:00:00"
    requires="4.30"
-   version="1.1"
+   version="1.11"
    >
 </plugin>
 
@@ -716,6 +716,7 @@ function help.show()
 
   Tell("\n")
   ColourNote("silver", "", "  This plugin is to be used in Whiteclaw.\n")
+  ColourNote("silver", "", "  It will auto-wear breath when looting the dead whelp,\n  or if the worn breath disintegrates (e.g., duration of 0 or rot-timer).\n")
   ColourTell("white", "", "   wcc begin                  ")
   ColourNote("gray", "", "After giving gem to yeti, this command enters boss area, runs to boss, and looks at it.\n")
   ColourTell("white", "", "   wcc dragon                 ")
@@ -740,11 +741,9 @@ function help.show()
   end
   Tell("\n")
 end 
---[[
-  Needed
-    -- toggle noting timestamps
-]]
-
+function OnPluginInstall()
+  utility.print("Aard_WCC_Epic loaded. @Wwcc help@w for more info.")
+end
 
 ----------------------------------------------------------------------------------------------------------
 -- Extras
